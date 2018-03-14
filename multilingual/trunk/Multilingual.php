@@ -3,7 +3,7 @@
 Plugin Name: Multilingual
 Plugin URI: http://presstify.com/multilingual
 Description: Gestion de site multilingue basée sur Wordpress multisite
-Version: 1.1.525
+Version: 1.0.0
 Author: Milkcreation
 Author URI: http://milkcreation.fr
 Text Domain: tify
