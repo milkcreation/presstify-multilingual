@@ -100,7 +100,7 @@ class Switcher
         // Création des liens
         $args['links'] = array();
         foreach( Multilingual::getSites() as $site ) :    
-            if( $site->archived || $site->deleted )
+            if( $site->archived || $site->deleted || !$site->public )
                 continue;
             
             $blog_id = $site->blog_id;

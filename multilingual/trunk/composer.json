@@ -5,6 +5,7 @@
   "keywords": ["presstify", "plugins", "wordpress", "multilingual"],
   "homepage": "http://svn.milkcreation.fr/presstify-plugins/multilingual",
   "license": "proprietary",
+  "time": "2018-06-12",
   "authors": [
     {
       "name": "Jordy Manner",
