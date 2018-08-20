@@ -1,0 +1,29 @@
+.tiFyMultilingual_LocaleItems,
+.tiFyMultilingual_LocaleItem{
+    margin:0; padding:0;
+}
+.tiFyMultilingual_LocaleItemLink{
+    position:relative;
+    display:inline-block;
+    min-height:18px;
+    padding-left:30px;
+    line-height:100%;
+}
+.tiFyMultilingual_LocaleItemLink strong.error{
+    color:red;
+}
+.tiFyMultilingual_LocaleItemLink .flag{
+    position:absolute;
+    top:0; left:0;
+    opacity:0.2;
+}
+.tiFyMultilingual_LocaleItem--translated .flag{
+    opacity:1;
+}
+.tiFyMultilingual_LocaleItemSpinner{
+   vertical-align:top;
+   display:none;
+}
+.tiFyMultilingual_LocaleItemRowActions{
+    color:#DDD;
+}
