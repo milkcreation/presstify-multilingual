@@ -1,19 +1,45 @@
 <?php
-/*
-Plugin Name: Multilingual
-Plugin URI: http://presstify.com/multilingual
-Description: Gestion de site multilingue basée sur Wordpress multisite
-Version: 1.0.1
-Author: Milkcreation
-Author URI: http://milkcreation.fr
-Text Domain: tify
-*/
+
+/**
+ * @name Multilingual
+ * @desc Extension PresstiFy de gestion de sites multilingues
+ * @author Jordy Manner <jordy@tigreblanc.fr>
+ * @package presstify-plugins/multilingual
+ * @namespace tiFy\Plugins\Multilingual
+ * @version 2.0.0
+ */
 
 namespace tiFy\Plugins\Multilingual;
 
-use tiFy\Lib\Country;
-
-class Multilingual extends \tiFy\Environment\Plugin
+/**
+ * Class Multilingual
+ * @package tiFy\Plugins\Multilingual
+ *
+ * Activation :
+ * ----------------------------------------------------------------------------------------------------
+ * Dans config/app.php ajouter \tiFy\Plugins\Multilingual\Multilingual à la liste des fournisseurs de services
+ *     chargés automatiquement par l'application.
+ * ex.
+ * <?php
+ * ...
+ * use tiFy\Plugins\Multilingual\Multilingual;
+ * ...
+ *
+ * return [
+ *      ...
+ *      'providers' => [
+ *          ...
+ *          Multilingual::class
+ *          ...
+ *      ]
+ * ];
+ *
+ * Configuration :
+ * ----------------------------------------------------------------------------------------------------
+ * Dans le dossier de config, créer le fichier multilingual.php
+ * @see /vendor/presstify-plugins/multilingual/Resources/config/multilingual.php Exemple de configuration
+ */
+class Multilingual
 {
     /**
      * Listes des sites
@@ -61,8 +87,6 @@ class Multilingual extends \tiFy\Environment\Plugin
         if (!is_multisite()) :
             return;
         endif;
-
-        parent::__construct();
 
         // Définition des variables d'environnement
         /// Définition des traduction de locales
