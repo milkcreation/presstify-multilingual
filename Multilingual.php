@@ -11,6 +11,10 @@
 
 namespace tiFy\Plugins\Multilingual;
 
+use tiFy\Kernel\Collection\Collection;
+use tiFy\Plugins\Multilingual\Contracts\Multilingual as MultilingualContracts;
+use tiFy\Plugins\Multilingual\Partial\MultilingualFlag\MultilingualFlag;
+
 /**
  * Class Multilingual
  * @package tiFy\Plugins\Multilingual
@@ -22,14 +26,14 @@ namespace tiFy\Plugins\Multilingual;
  * ex.
  * <?php
  * ...
- * use tiFy\Plugins\Multilingual\Multilingual;
+ * use tiFy\Plugins\Multilingual\MultilingualServiceProvider;
  * ...
  *
  * return [
  *      ...
  *      'providers' => [
  *          ...
- *          Multilingual::class
+ *          MultilingualServiceProvider::class
  *          ...
  *      ]
  * ];
@@ -38,44 +42,28 @@ namespace tiFy\Plugins\Multilingual;
  * ----------------------------------------------------------------------------------------------------
  * Dans le dossier de config, créer le fichier multilingual.php
  * @see /vendor/presstify-plugins/multilingual/Resources/config/multilingual.php Exemple de configuration
+ *
+ * @see components/flag-icon-css
  */
-class Multilingual
+class Multilingual extends Collection implements MultilingualContracts
 {
     /**
-     * Listes des sites
+     * Liste des sites disponibles.
+     * @var MultilingualSite[]
      */
-    private static $Sites = [];
+    protected $items = [];
 
     /**
-     *
+     * Liste des langages disponibles.
      * @var array
      */
-    private static $Locales = [];
+    protected $languages = [];
 
     /**
-     *
+     * Liste des traductions disponibles.
+     * @var array
      */
-    private static $Flags = [];
-
-    /**
-     *
-     */
-    public static $AvailableLanguages = [];
-
-    /**
-     *
-     */
-    public static $Translations = [];
-
-    /**
-     * Liste des types de post traductibles
-     */
-    private static $TranslatePostType = [];
-
-    /**
-     * Administration de la page par défaut
-     */
-    private static $DMZ = true;
+    protected $translations = [];
 
     /**
      * CONSTRUCTEUR
@@ -84,34 +72,49 @@ class Multilingual
      */
     public function __construct()
     {
-        if (!is_multisite()) :
-            return;
+        if (!function_exists('wp_get_available_translations')) :
+            require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
         endif;
 
-        // Définition des variables d'environnement
-        /// Définition des traduction de locales
-        if (!function_exists('wp_get_available_translations')) {
-            require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
-        }
+        $this->setLanguages();
+        $this->setTranslations();
+        $this->setSites();
 
-        self::$AvailableLanguages = get_available_languages();
-        self::$Translations = wp_get_available_translations();
-        self::$Translations['en_US'] = [
-            'language'     => 'en_US',
-            'english_name' => 'English (United States)',
-            'native_name'  => 'English (United States)',
-            'iso'          => [1 => 'en'],
-        ];
+        partial()->register('multilingual-flag', MultilingualFlag::class);
 
-        /// Définition de la liste des sites
-        $this->_setSites();
+        if ($this->items) :
+            add_action('admin_bar_menu', function (\WP_Admin_Bar $wp_admin_bar) {
+                foreach ($this->items as $item) :
+                    $wp_admin_bar->add_node(
+                        [
+                            'id'     => 'blog-' . $item->get('blog_id'),
+                            'title'  => partial('multilingual-flag', ['site' => $item]) .
+                                        get_blog_option($item->get('blog_id'), 'blogname'),
+                            'parent' => 'my-sites-list',
+                            'href'   => get_admin_url($item->get('blog_id')),
+                            'meta'   => [
+                                'class' => 'Multilingual-siteEntry',
+                            ]
+                        ]
+                    );
+                endforeach;
+            }, 99);
 
-        /// Définition des locales
-        $this->_setLocales();
+            if ($this->config('admin_enqueue_scripts')) :
+                add_action('admin_enqueue_scripts', function () {
+                   partial('multilingual-flag')->enqueue_scripts();
+                });
+            endif;
 
-        /// Définition des drapeaux par pays de site
-        $this->_setFlags();
+            if ($this->config('wp_enqueue_scripts')) :
+                add_action('wp_enqueue_scripts', function () {
+                    partial('multilingual-flag')->enqueue_scripts();
+                });
+            endif;
+        endif;
 
+
+        /**
         /// Définition de la gestion des traduction
         if ($translate = self::tFyAppConfig('translate')) :
             if (!empty($translate['admin'])) :
@@ -135,288 +138,101 @@ class Multilingual
         $this->appAddAction('setup_theme');
         $this->appAddAction('wp_print_styles', 'print_styles');
         $this->appAddAction('admin_print_styles', 'print_styles');
-        $this->appAddAction('admin_bar_menu', null, 99);
+
         $this->appAddAction('tify_taboox_register_node');
         $this->appAddAction('tify_custom_columns_register');
         $this->appAddAction('tify_options_register_node');
+         */
     }
 
     /**
-     * EVENEMENTS
-     */
-    /**
-     * A l'initialisation du thème
-     */
-    final public function setup_theme()
-    {
-        if (!get_option('tify_multilingual_adminlang', false)) {
-            return;
-        }
-
-        add_filter('locale', function ($locale = null) {
-            if (is_admin()) {
-                $locale = get_option('tify_multilingual_adminlang', 0);
-            }
-            return $locale;
-        });
-    }
-
-    /**
-     * Styles de la barre d'administration
-     */
-    final public function print_styles()
-    {
-        ?>
-        <style type="text/css">#wp-admin-bar-my-sites .tify_multilingual-flag {
-                position: absolute;
-                top: 50%;
-                margin-top: -9px;
-                left: 10px;
-                width: 30px;
-                height: 18px;
-                vertical-align: middle;
-                margin-right: 5px;
-            }
-
-            #wp-admin-bar-my-sites .tify_multilingual-entry > a.ab-item {
-                padding-left: 45px;
-            }</style><?php
-    }
-
-    /**
-     * Personnalisation de la barre d'administration
-     * @see http://fr.wikipedia.org/wiki/ISO_3166-1
-     * @see http://wpcentral.io/internationalization/
-     */
-    final public function admin_bar_menu($wp_admin_bar)
-    {
-        foreach (self::getSites() as $site) :
-            $blog_id = $site->blog_id;
-            $locale = ($_locale = get_blog_option($blog_id, 'WPLANG')) ? $_locale : 'en_US';
-
-            $wp_admin_bar->add_node(
-                [
-                    'id'     => 'blog-' . $blog_id,
-                    'title'  => self::getFlag($blog_id) . get_blog_option($blog_id, 'blogname'),
-                    'parent' => 'my-sites-list',
-                    'href'   => get_admin_url($blog_id),
-                    'meta'   => [
-                        'class' => 'tify_multilingual-entry',
-                    ],
-                ]
-            );
-        endforeach;
-    }
-
-    /**
-     * Déclaration de taboox
-     */
-    final public function tify_taboox_register_form()
-    {
-        //tify_taboox_register_form( 'tiFy_Multilingual_MenuSwitcher_Taboox', $this );
-        //tify_taboox_register_form( 'tiFy_Multilingual_AdminLang_Taboox', $this );
-    }
-
-    /**
-     * Déclaration des boîte de saisie
-     */
-    final public function tify_taboox_register_node()
-    {
-        foreach (self::getTranslatePostType() as $post_type => $attrs) :
-            tify_taboox_register_node(
-                $post_type,
-                [
-                    'id'    => 'tiFyMultilingualTranslate',
-                    'title' => __('Traductions', 'tify'),
-                    'cb'    => '\tiFy\Plugins\Multilingual\Taboox\PostType\Translate\Admin\Translate',
-                    'order' => 0,
-                ]
-            );
-        endforeach;
-    }
-
-    /**
+     * Définition de la liste des langues disponibles.
      *
+     * @return void
      */
-    final public function tify_custom_columns_register()
+    protected function setLanguages()
     {
-        foreach (self::getTranslatePostType() as $post_type => $attrs) :
-            tify_custom_columns_register(
-                '\tiFy\Plugins\Multilingual\CustomColumns\PostType\Translate\Translate',
-                [
-                    'position' => 3,
-                ],
-                'post_type',
-                $post_type
-            );
+        $this->languages = get_available_languages();
+    }
+
+
+    /**
+     * Définition de la liste des sites disponibles.
+     *
+     * @return void
+     */
+    protected function setSites()
+    {
+        foreach(get_sites() as $wp_site) :
+            $this->items[$wp_site->blog_id] = new MultilingualSite($wp_site, $this);
         endforeach;
     }
 
     /**
-     * Personnalisation de la page par défaut
+     * Définition de la liste des traductions disponibles.
+     *
+     * @return void
      */
-    final public function tify_options_register_node()
+    protected function setTranslations()
     {
-        if (!self::$DMZ || empty(self::$TranslatePostType)) {
-            return;
-        }
+        $this->translations = wp_get_available_translations();
 
-        tify_options_register_node([
-            'id'    => 'tiFyMultilingualDMZ',
-            'title' => __('Traduction', 'tify'),
-            'cb'    => '\tiFy\Plugins\Multilingual\Taboox\Options\DMZ\Admin\DMZ',
-        ]);
+        $this->translations['en_US'] = $this->translations['en_US'] ?? [
+            'language'     => 'en_US',
+            'english_name' => 'English (United States)',
+            'native_name'  => 'English (United States)',
+            'iso'          => [1 => 'en'],
+        ];
     }
 
     /**
-     * CONTROLEURS
+     * @inheritdoc
      */
-    /**
-     * Définition de la liste des sites gérant le multilangage
-     */
-    private function _setSites()
+    public function config($key = null, $default = null)
     {
-        return self::$Sites = \get_sites();
+        return config("multilingual.$key", $default);
     }
 
     /**
-     * Définition des locales
+     * @inheritdoc
      */
-    private function _setLocales()
+    public function getFlagPath($iso)
     {
-        $locales = [];
-        foreach (self::getSites() as $site) :
-            $locales[$site->blog_id] = ($locale = get_blog_option($site->blog_id, 'WPLANG')) ? $locale : 'en_US';
-        endforeach;
+        $path = ABSPATH . "/vendor/components/flag-icon-css/flags/4x3/{$iso}.svg";
 
-        return self::$Locales = $locales;
+        return file_exists($path) ? $path : null;
     }
 
     /**
-     * Définition des drapeaux de site
+     * @inheritdoc
      */
-    private function _setFlags()
+    public function getTranslation($locale)
     {
-        foreach (self::getSites() as $site) :
-            $country = strtolower(substr(self::getLocale($site->blog_id), 3, 2));
-
-            if (!$flag = Country::getFlagImgSrc($country)) :
-                continue;
-            endif;
-
-            self::$Flags[$site->blog_id] = $flag;
-        endforeach;
+        return $this->translations[$locale] ?? null;
     }
 
     /**
-     * Récupération de la liste des sites du réseau multilangage
+     * @inheritdoc
      */
-    final public static function getSites($args = [])
+    public function resourcesDir($path = '')
     {
-        $sites = self::$Sites;
+        $path = $path ? '/' . ltrim($path, '/') : '';
 
-        extract($args);
-
-        if (!empty($exclude)) :
-            if (!is_array($exclude)) {
-                $exclude = explode(',', $exclude);
-            }
-
-            $exclude = array_map('absint', $exclude);
-            foreach ($sites as $k => $site) :
-                if (!in_array($site->blog_id, $exclude)) {
-                    continue;
-                }
-                unset($sites[$k]);
-            endforeach;
-        endif;
-
-        return $sites;
+        return (file_exists(__DIR__ . "/Resources{$path}"))
+            ? __DIR__ . "/Resources{$path}"
+            : '';
     }
 
     /**
-     * Récupération des traductions
+     * @inheritdoc
      */
-    final public static function getTranslations()
+    public function resourcesUrl($path = '')
     {
-        return self::$Translations;
-    }
+        $cinfo = class_info($this);
+        $path = $path ? '/' . ltrim($path, '/') : '';
 
-    /**
-     * Récupération de la traduction d'une locale
-     */
-    final public static function getTranslation($locale)
-    {
-        if (isset(self::$Translations[$locale])) {
-            return self::$Translations[$locale];
-        }
-    }
-
-    /**
-     * Récupération de la locale d'un site
-     */
-    final public static function getLocale($blog_id)
-    {
-        if (!isset(self::$Locales[$blog_id])) {
-            return;
-        }
-
-        return self::$Locales[$blog_id];
-    }
-
-    /**
-     * Récupération du drapeau d'un site
-     */
-    final public static function getFlag($blog_id, $attrs = [])
-    {
-        if (!isset(self::$Flags[$blog_id])) :
-            return;
-        endif;
-        $src = self::$Flags[$blog_id];
-
-        $flag = "<img src=\"{$src}\"";
-        foreach ($attrs as $k => $v) :
-            if (in_array($k, ['src', 'class'])) :
-                continue;
-            endif;
-            $flag .= " {$k}=\"{$v}\"";
-        endforeach;
-        $flag .= " class=\"flag tify_multilingual-flag tify_multilingual-flag-" . self::getLocale($blog_id) . "\"";
-        $flag .= "/>";
-
-        return $flag;
-    }
-
-    /**
-     * Déclaration des types de post traductibles
-     */
-    final public static function setTranslatePostType($post_type, $attrs)
-    {
-        if (!isset(self::$TranslatePostType[$post_type])) {
-            self::$TranslatePostType[$post_type] = $attrs;
-        }
-    }
-
-    /**
-     * Vérification d'existance d'un type de post traductible
-     */
-    final public static function hasTranslatePostType($post_type)
-    {
-        return isset(self::$TranslatePostType[$post_type]);
-    }
-
-    /**
-     * Récupération des attributs de type de post traductible
-     */
-    final public static function getTranslatePostType($type = null)
-    {
-        if (!$type) {
-            return self::$TranslatePostType;
-        }
-        if (isset(self::$TranslatePostType[$type])) {
-            return self::$TranslatePostType[$type];
-        }
-
-        return false;
+        return (file_exists($cinfo->getDirname() . "/Resources{$path}"))
+            ? $cinfo->getUrl() . "/Resources{$path}"
+            : '';
     }
 }
