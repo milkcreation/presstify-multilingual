@@ -10,7 +10,7 @@
   ],
   "homepage": "https://svn.tigreblanc.fr/presstify-plugins/multilingual",
   "license": "proprietary",
-  "time": "2018-12-31",
+  "time": "2018-01-10",
   "authors": [
     {
       "name": "Jordy Manner",
@@ -26,7 +26,8 @@
   ],
   "require": {
     "composer/installers": "~1.0",
-    "presstify/framework": ">=1.4"
+    "components/flag-icon-css": "^3.2",
+    "presstify/framework": "2.0.*"
   },
   "autoload": {
     "files": [
