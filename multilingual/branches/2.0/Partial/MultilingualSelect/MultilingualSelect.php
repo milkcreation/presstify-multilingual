@@ -1,13 +1,13 @@
 <?php
 
-namespace tiFy\Plugins\Multilingual\Partial\MultilingualFlag;
+namespace tiFy\Plugins\Multilingual\Partial\MultilingualSelect;
 
 use tiFy\Partial\PartialController;
 use tiFy\Partial\PartialView;
 use tiFy\Plugins\Multilingual\Contracts\Multilingual;
 use tiFy\Plugins\Multilingual\Contracts\MultilingualSite;
 
-class MultilingualFlag extends PartialController
+class MultilingualSelect extends PartialController
 {
     /**
      * Liste des attributs de configuration.
@@ -23,8 +23,7 @@ class MultilingualFlag extends PartialController
         'before'    => '',
         'after'     => '',
         'attrs'     => [],
-        'viewer'    => [],
-        'site'      => 0
+        'viewer'    => []
     ];
 
     /**
@@ -49,10 +48,10 @@ class MultilingualFlag extends PartialController
             'init',
             function () {
                 wp_register_style(
-                    'MultilingualFlag',
-                    app()->get('multilingual')->resourcesUrl('/assets/partial/multilingual-flag/css/styles.css'),
+                    'MultilingualSelect',
+                    app()->get('multilingual')->resourcesUrl('/assets/partial/multilingual-select/css/styles.css'),
                     [],
-                    190110
+                    190111
                 );
             }
         );
@@ -63,7 +62,9 @@ class MultilingualFlag extends PartialController
      */
     public function enqueue_scripts()
     {
-        wp_enqueue_style('MultilingualFlag');
+        wp_enqueue_style('MultilingualSelect');
+        partial('dropdown')->enqueue_scripts();
+        partial('multilingual-flag')->enqueue_scripts();
     }
 
     /**
@@ -73,29 +74,20 @@ class MultilingualFlag extends PartialController
     {
         parent::parse($attrs);
 
-        $this->set('attrs.class', sprintf($this->get('attrs.class', '%s'), 'MultilingualFlag'));
+        /** @var Multilingual $multilingual */
+        $multilingual = app()->get('multilingual');
 
-        $site = $this->get('site');
-        if (!$site instanceof MultilingualSite) :
-            $site = app()->get('multilingual')->get((int) $site);
-        endif;
-        $this->set('site', $site);
+        $current = get_current_blog_id();
+        $this->set('button', (string) $this->viewer('item', ['item' =>$multilingual->get($current)]));
 
-        if ($site) :
-            if ($src = $site->flagSrc()) :
-                $this->set('attrs.src', $src);
+        $items = [];
+        foreach($multilingual->all() as $item) :
+            /** @var MultilingualSite $item */
+            if ($item->get('blog_id') != $current) :
+                $items[$item->get('blog_id')] = (string) $this->viewer('item', compact('item'));
             endif;
-        endif;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function parseDefaults()
-    {
-        foreach($this->get('view', []) as $key => $value) :
-            $this->viewer()->set($key, $value);
         endforeach;
+        $this->set('items', $items);
     }
 
     /**
@@ -104,7 +96,7 @@ class MultilingualFlag extends PartialController
     public function viewer($view = null, $data = [])
     {
         if (!$this->viewer) :
-            $viewer_dir = app()->get('multilingual')->resourcesDir('/views/multilingual-flag');
+            $viewer_dir = app()->get('multilingual')->resourcesDir('/views/multilingual-select');
 
             $this->viewer = view()
                 ->setDirectory(is_dir($viewer_dir) ? $viewer_dir : null)

@@ -2,7 +2,9 @@
 
 namespace tiFy\Plugins\Multilingual\Contracts;
 
-interface Multilingual
+use tiFy\Contracts\Kernel\Collection;
+
+interface Multilingual extends Collection
 {
     /**
      * Controleur de configuration de l'extension.
@@ -20,13 +22,14 @@ interface Multilingual
     public function config($key = null, $default = null);
 
     /**
-     * Récupération de l'instance d'un site multilingue.
+     * Récupération du chemin vers le drapeau associé à code de langue iso.
      *
-     * @param int $blog_id Identifiant de qualification du site.
+     * @param string $iso Code de langue iso. ISO 639-1|ISO 639-2|ISO 639-3
+     * @see https://fr.wikipedia.org/wiki/Liste_des_codes_ISO_639-1
      *
-     * @return MultilingualSite
+     * @return
      */
-    public function get($blog_id);
+    public function getFlagPath($iso);
 
     /**
      * Récupération de la liste des attributs de traduction associé à une locale.

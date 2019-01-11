@@ -32,6 +32,22 @@ class MultilingualSite extends ParamsBag implements MultilingualSiteContract
     /**
      * @inheritdoc
      */
+    public function id()
+    {
+        return (int)$this->get('blog_id');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function iso($code)
+    {
+        return $this->get("translation.iso.{$code}", $this->get('locale'));
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function flagSrc()
     {
         return Tools::File()->imgBase64Src($this->get('flag'));
