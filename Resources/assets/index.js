@@ -1,2 +1,2 @@
 /** Sass */
-import './scss/multilingual-flag.scss';
+import './partial/multilingual-flag/index';

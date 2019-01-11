@@ -1,14 +1,6 @@
 <?php
 /**
- * @var tiFy\Plugins\Multilingual\Contracts\MultilingualSite $site;
+ * @var tiFy\Partial\PartialView $this
  */
 ?>
-
-<?php
-echo partial(
-    'tag',
-     [
-        'tag'       => 'img',
-        'attrs'     => $this->get('attrs', [])
-     ]
-);
+<?php echo partial('tag', ['tag' => 'img', 'attrs' => $this->get('attrs', [])]);

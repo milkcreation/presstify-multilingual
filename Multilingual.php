@@ -13,7 +13,6 @@ namespace tiFy\Plugins\Multilingual;
 
 use tiFy\Kernel\Collection\Collection;
 use tiFy\Plugins\Multilingual\Contracts\Multilingual as MultilingualContracts;
-use tiFy\Plugins\Multilingual\Partial\MultilingualFlag\MultilingualFlag;
 
 /**
  * Class Multilingual
@@ -42,8 +41,6 @@ use tiFy\Plugins\Multilingual\Partial\MultilingualFlag\MultilingualFlag;
  * ----------------------------------------------------------------------------------------------------
  * Dans le dossier de config, créer le fichier multilingual.php
  * @see /vendor/presstify-plugins/multilingual/Resources/config/multilingual.php Exemple de configuration
- *
- * @see components/flag-icon-css
  */
 class Multilingual extends Collection implements MultilingualContracts
 {
@@ -72,77 +69,9 @@ class Multilingual extends Collection implements MultilingualContracts
      */
     public function __construct()
     {
-        if (!function_exists('wp_get_available_translations')) :
-            require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
-        endif;
-
         $this->setLanguages();
         $this->setTranslations();
         $this->setSites();
-
-        partial()->register('multilingual-flag', MultilingualFlag::class);
-
-        if ($this->items) :
-            add_action('admin_bar_menu', function (\WP_Admin_Bar $wp_admin_bar) {
-                foreach ($this->items as $item) :
-                    $wp_admin_bar->add_node(
-                        [
-                            'id'     => 'blog-' . $item->get('blog_id'),
-                            'title'  => partial('multilingual-flag', ['site' => $item]) .
-                                        get_blog_option($item->get('blog_id'), 'blogname'),
-                            'parent' => 'my-sites-list',
-                            'href'   => get_admin_url($item->get('blog_id')),
-                            'meta'   => [
-                                'class' => 'Multilingual-siteEntry',
-                            ]
-                        ]
-                    );
-                endforeach;
-            }, 99);
-
-            if ($this->config('admin_enqueue_scripts')) :
-                add_action('admin_enqueue_scripts', function () {
-                   partial('multilingual-flag')->enqueue_scripts();
-                });
-            endif;
-
-            if ($this->config('wp_enqueue_scripts')) :
-                add_action('wp_enqueue_scripts', function () {
-                    partial('multilingual-flag')->enqueue_scripts();
-                });
-            endif;
-        endif;
-
-
-        /**
-        /// Définition de la gestion des traduction
-        if ($translate = self::tFyAppConfig('translate')) :
-            if (!empty($translate['admin'])) :
-                if (isset($translate['admin']['dmz'])) :
-                    self::$DMZ = $translate['admin']['dmz'];
-                endif;
-            endif;
-            if (!empty($translate['post_type'])) :
-                foreach ($translate['post_type'] as $post_type => $attrs) :
-                    self::setTranslatePostType($post_type, $attrs);
-                endforeach;
-            endif;
-        endif;
-
-        // Déclaration des dépendances
-        new Duplicate\PostType\PostType;
-        new Switcher;
-        require_once(self::tFyAppDirname() . '/Helpers.php');
-
-        // Déclaration des événements
-        $this->appAddAction('setup_theme');
-        $this->appAddAction('wp_print_styles', 'print_styles');
-        $this->appAddAction('admin_print_styles', 'print_styles');
-
-        $this->appAddAction('tify_taboox_register_node');
-        $this->appAddAction('tify_custom_columns_register');
-        $this->appAddAction('tify_options_register_node');
-         */
     }
 
     /**
@@ -154,7 +83,6 @@ class Multilingual extends Collection implements MultilingualContracts
     {
         $this->languages = get_available_languages();
     }
-
 
     /**
      * Définition de la liste des sites disponibles.
