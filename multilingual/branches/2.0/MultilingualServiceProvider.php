@@ -6,7 +6,7 @@ use tiFy\App\Container\AppServiceProvider;
 use tiFy\Plugins\Multilingual\Contracts\Multilingual as MultilingualContract;
 use tiFy\Plugins\Multilingual\Contracts\MultilingualSite as MultilingualSiteContract;
 use tiFy\Plugins\Multilingual\Partial\MultilingualFlag\MultilingualFlag;
-use tiFy\Plugins\Multilingual\Partial\MultilingualSelect\MultilingualSelect;
+use tiFy\Plugins\Multilingual\Partial\MultilingualDropdown\MultilingualDropdown;
 
 class MultilingualServiceProvider extends AppServiceProvider
 {
@@ -38,7 +38,7 @@ class MultilingualServiceProvider extends AppServiceProvider
                 $this->multilingual = $this->getContainer()->get('multilingual');
 
                 partial()->register('multilingual-flag', MultilingualFlag::class);
-                partial()->register('multilingual-select', MultilingualSelect::class);
+                partial()->register('multilingual-dropdown', MultilingualDropdown::class);
 
                 /** @var MultilingualContract $multilingual */
                 if ($this->multilingual->exists()) :

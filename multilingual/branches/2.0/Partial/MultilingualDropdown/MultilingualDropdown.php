@@ -1,13 +1,13 @@
 <?php
 
-namespace tiFy\Plugins\Multilingual\Partial\MultilingualSelect;
+namespace tiFy\Plugins\Multilingual\Partial\MultilingualDropdown;
 
 use tiFy\Partial\PartialController;
 use tiFy\Partial\PartialView;
 use tiFy\Plugins\Multilingual\Contracts\Multilingual;
 use tiFy\Plugins\Multilingual\Contracts\MultilingualSite;
 
-class MultilingualSelect extends PartialController
+class MultilingualDropdown extends PartialController
 {
     /**
      * Liste des attributs de configuration.
@@ -48,8 +48,8 @@ class MultilingualSelect extends PartialController
             'init',
             function () {
                 wp_register_style(
-                    'MultilingualSelect',
-                    app()->get('multilingual')->resourcesUrl('/assets/partial/multilingual-select/css/styles.css'),
+                    'MultilingualDropdown',
+                    app()->get('multilingual')->resourcesUrl('/assets/partial/multilingual-Dropdown/css/styles.css'),
                     [],
                     190111
                 );
@@ -62,7 +62,7 @@ class MultilingualSelect extends PartialController
      */
     public function enqueue_scripts()
     {
-        wp_enqueue_style('MultilingualSelect');
+        wp_enqueue_style('MultilingualDropdown');
         partial('dropdown')->enqueue_scripts();
         partial('multilingual-flag')->enqueue_scripts();
     }
@@ -74,11 +74,13 @@ class MultilingualSelect extends PartialController
     {
         parent::parse($attrs);
 
+        $this->set('attrs.class', sprintf($this->get('attrs.class', '%s'), 'MultilingualDropdown'));
+
         /** @var Multilingual $multilingual */
         $multilingual = app()->get('multilingual');
 
         $current = get_current_blog_id();
-        $this->set('button', (string) $this->viewer('item', ['item' =>$multilingual->get($current)]));
+        $this->set('button', (string) $this->viewer('button', ['item' => $multilingual->get($current)]));
 
         $items = [];
         foreach($multilingual->all() as $item) :
@@ -91,12 +93,22 @@ class MultilingualSelect extends PartialController
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
+     */
+    public function parseDefaults()
+    {
+        foreach($this->get('view', []) as $key => $value) :
+            $this->viewer()->set($key, $value);
+        endforeach;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function viewer($view = null, $data = [])
     {
         if (!$this->viewer) :
-            $viewer_dir = app()->get('multilingual')->resourcesDir('/views/multilingual-select');
+            $viewer_dir = app()->get('multilingual')->resourcesDir('/views/multilingual-dropdown');
 
             $this->viewer = view()
                 ->setDirectory(is_dir($viewer_dir) ? $viewer_dir : null)
