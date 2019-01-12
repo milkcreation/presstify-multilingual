@@ -1,14 +1,5 @@
 <?php
 
-/**
- * @name Multilingual
- * @desc Extension PresstiFy de gestion de sites multilingues
- * @author Jordy Manner <jordy@tigreblanc.fr>
- * @package presstify-plugins/multilingual
- * @namespace tiFy\Plugins\Multilingual
- * @version 2.0.0
- */
-
 namespace tiFy\Plugins\Multilingual;
 
 use tiFy\Kernel\Collection\Collection;
@@ -16,12 +7,16 @@ use tiFy\Plugins\Multilingual\Contracts\Multilingual as MultilingualContracts;
 
 /**
  * Class Multilingual
- * @package tiFy\Plugins\Multilingual
  *
- * Activation :
- * ----------------------------------------------------------------------------------------------------
- * Dans config/app.php ajouter \tiFy\Plugins\Multilingual\Multilingual à la liste des fournisseurs de services
- *     chargés automatiquement par l'application.
+ * @desc Extension PresstiFy de gestion de sites multilingues.
+ * @author Jordy Manner <jordy@tigreblanc.fr>
+ * @package tiFy\Plugins\Multilingual
+ * @version 2.0.1
+ *
+ * USAGE :
+ * Activation
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Dans config/app.php ajouter \tiFy\Plugins\Multilingual\Multilingual à la liste des fournisseurs de services.
  * ex.
  * <?php
  * ...
@@ -37,10 +32,10 @@ use tiFy\Plugins\Multilingual\Contracts\Multilingual as MultilingualContracts;
  *      ]
  * ];
  *
- * Configuration :
- * ----------------------------------------------------------------------------------------------------
+ * Configuration
+ * ---------------------------------------------------------------------------------------------------------------------
  * Dans le dossier de config, créer le fichier multilingual.php
- * @see /vendor/presstify-plugins/multilingual/Resources/config/multilingual.php Exemple de configuration
+ * @see /vendor/presstify-plugins/multilingual/Resources/config/multilingual.php
  */
 class Multilingual extends Collection implements MultilingualContracts
 {
