@@ -44,17 +44,14 @@ class MultilingualDropdown extends PartialController
      */
     public function boot()
     {
-        add_action(
-            'init',
-            function () {
-                wp_register_style(
-                    'MultilingualDropdown',
-                    app()->get('multilingual')->resourcesUrl('/assets/partial/multilingual-Dropdown/css/styles.css'),
-                    [],
-                    190111
-                );
-            }
-        );
+        add_action('init', function () {
+            wp_register_style(
+                'MultilingualDropdown',
+                app()->get('multilingual')->resourcesUrl('/assets/partial/multilingual-Dropdown/css/styles.css'),
+                [],
+                190111
+            );
+        });
     }
 
     /**
@@ -82,13 +79,18 @@ class MultilingualDropdown extends PartialController
         $current = get_current_blog_id();
         $this->set('button', (string) $this->viewer('button', ['item' => $multilingual->get($current)]));
 
+        $sites = $multilingual->collect()->filter(function(MultilingualSite $item) {
+            return $item['deleted'] !== '1' && $item['archived'] !== '1';
+        });
+
         $items = [];
-        foreach($multilingual->all() as $item) :
+        foreach($sites as $item) :
             /** @var MultilingualSite $item */
             if ($item->get('blog_id') != $current) :
                 $items[$item->get('blog_id')] = (string) $this->viewer('item', compact('item'));
             endif;
         endforeach;
+
         $this->set('items', $items);
     }
 
