@@ -1,4 +1,19 @@
 <?php
+
+use tiFy\Plugins\Multilingual\Contracts\Multilingual;
+
+if (!function_exists('multilingual')) {
+    /**
+     * Récupération de l'instance du plugin Multilingual.
+     *
+     * @return Multilingual
+     */
+    function multilingual() : Multilingual
+    {
+        return app()->get('multilingual');
+    }
+}
+
 /**
  * Affichage de l'interface de bascule de langage
  *
