@@ -21,7 +21,9 @@ class MultilingualServiceProvider extends AppServiceProvider
      * @var string[]
      */
     protected $provides = [
-        'multilingual'
+        'multilingual',
+        'partial.factory.multilingual-flag',
+        'partial.factory.multilingual-dropdown',
     ];
 
     /**
@@ -37,8 +39,15 @@ class MultilingualServiceProvider extends AppServiceProvider
 
                 $this->multilingual = $this->getContainer()->get('multilingual');
 
-                partial()->register('multilingual-flag', MultilingualFlag::class);
-                partial()->register('multilingual-dropdown', MultilingualDropdown::class);
+                partial()->register(
+                    'multilingual-flag',
+                    $this->getContainer()->get('partial.factory.multilingual-flag')
+                );
+
+                partial()->register(
+                    'multilingual-dropdown',
+                    $this->getContainer()->get('partial.factory.multilingual-dropdown')
+                );
 
                 /** @var MultilingualContract $multilingual */
                 if ($this->multilingual->exists()) :
@@ -84,6 +93,14 @@ class MultilingualServiceProvider extends AppServiceProvider
     {
         $this->getContainer()->share('multilingual', function () {
             return new Multilingual();
+        });
+
+        $this->getContainer()->add('partial.factory.multilingual-flag', function (?string $id = null, ?array $attrs = null) {
+            return new MultilingualFlag($id, $attrs);
+        });
+
+        $this->getContainer()->add('partial.factory.multilingual-dropdown', function (?string $id = null, ?array $attrs = null) {
+            return new MultilingualDropdown($id, $attrs);
         });
     }
 }

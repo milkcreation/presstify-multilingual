@@ -2,12 +2,11 @@
 
 namespace tiFy\Plugins\Multilingual\Partial\MultilingualFlag;
 
-use tiFy\Partial\PartialController;
+use tiFy\Partial\PartialFactory;
 use tiFy\Partial\PartialView;
-use tiFy\Plugins\Multilingual\Contracts\Multilingual;
 use tiFy\Plugins\Multilingual\Contracts\MultilingualSite;
 
-class MultilingualFlag extends PartialController
+class MultilingualFlag extends PartialFactory
 {
     /**
      * Liste des attributs de configuration.
