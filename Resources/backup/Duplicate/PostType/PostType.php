@@ -3,9 +3,8 @@
 namespace tiFy\Plugins\Multilingual\Duplicate\PostType;
 
 use tiFy\Plugins\Multilingual\Multilingual;
-use tiFy\tiFy;
 
-final class PostType extends \tiFy\App
+final class PostType
 {
     /**
      * CONSTRUCTEUR
@@ -14,9 +13,6 @@ final class PostType extends \tiFy\App
      */
     public function __construct()
     {
-        parent::__construct();
-
-        // Déclaration des événements
         $this->appAddAction('post_action_tiFyMultilingualDuplicatePost');
         $this->appAddAction('admin_notices');
     }
