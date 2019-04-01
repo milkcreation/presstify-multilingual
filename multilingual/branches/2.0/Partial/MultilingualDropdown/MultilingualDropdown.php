@@ -2,12 +2,12 @@
 
 namespace tiFy\Plugins\Multilingual\Partial\MultilingualDropdown;
 
-use tiFy\Partial\PartialController;
+use tiFy\Partial\PartialFactory;
 use tiFy\Partial\PartialView;
 use tiFy\Plugins\Multilingual\Contracts\Multilingual;
 use tiFy\Plugins\Multilingual\Contracts\MultilingualSite;
 
-class MultilingualDropdown extends PartialController
+class MultilingualDropdown extends PartialFactory
 {
     /**
      * Liste des attributs de configuration.
