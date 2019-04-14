@@ -2,13 +2,13 @@
 
 namespace tiFy\Plugins\Multilingual;
 
-use tiFy\App\Container\AppServiceProvider;
+use tiFy\Container\ServiceProvider;
 use tiFy\Plugins\Multilingual\Contracts\Multilingual as MultilingualContract;
 use tiFy\Plugins\Multilingual\Contracts\MultilingualSite as MultilingualSiteContract;
 use tiFy\Plugins\Multilingual\Partial\MultilingualFlag\MultilingualFlag;
 use tiFy\Plugins\Multilingual\Partial\MultilingualDropdown\MultilingualDropdown;
 
-class MultilingualServiceProvider extends AppServiceProvider
+class MultilingualServiceProvider extends ServiceProvider
 {
     /**
      * @var MultilingualContract

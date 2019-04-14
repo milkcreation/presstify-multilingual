@@ -11,7 +11,7 @@ use tiFy\Plugins\Multilingual\Contracts\Multilingual as MultilingualContracts;
  * @desc Extension PresstiFy de gestion de sites multilingues.
  * @author Jordy Manner <jordy@tigreblanc.fr>
  * @package tiFy\Plugins\Multilingual
- * @version 2.0.4
+ * @version 2.0.5
  *
  * USAGE :
  * Activation
