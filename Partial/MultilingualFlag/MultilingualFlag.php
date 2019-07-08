@@ -2,6 +2,7 @@
 
 namespace tiFy\Plugins\Multilingual\Partial\MultilingualFlag;
 
+use tiFy\Contracts\Partial\PartialFactory as PartialFactoryContract;
 use tiFy\Partial\PartialFactory;
 use tiFy\Partial\PartialView;
 use tiFy\Plugins\Multilingual\Contracts\MultilingualSite;
@@ -27,22 +28,9 @@ class MultilingualFlag extends PartialFactory
     ];
 
     /**
-     * CONSTRUCTEUR.
-     *
-     * @param string $id Nom de qualification.
-     * @param array $attrs Liste des attributs de configuration.
-     *
-     * @return void
-     */
-    public function __construct($id = null, $attrs = [])
-    {
-        parent::__construct($id, $attrs);
-    }
-
-    /**
      * @inheritdoc
      */
-    public function boot()
+    public function boot(): void
     {
         add_action(
             'init',
@@ -68,9 +56,9 @@ class MultilingualFlag extends PartialFactory
     /**
      * @inheritdoc
      */
-    public function parse($attrs = [])
+    public function parse(): PartialFactoryContract
     {
-        parent::parse($attrs);
+        parent::parse();
 
         $this->set('attrs.class', sprintf($this->get('attrs.class', '%s'), 'MultilingualFlag'));
 
@@ -85,16 +73,20 @@ class MultilingualFlag extends PartialFactory
                 $this->set('attrs.src', $src);
             endif;
         endif;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function parseDefaults()
+    public function parseDefaults(): PartialFactoryContract
     {
         foreach($this->get('view', []) as $key => $value) :
             $this->viewer()->set($key, $value);
         endforeach;
+
+        return $this;
     }
 
     /**

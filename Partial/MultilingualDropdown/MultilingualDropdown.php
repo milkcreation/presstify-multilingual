@@ -2,6 +2,7 @@
 
 namespace tiFy\Plugins\Multilingual\Partial\MultilingualDropdown;
 
+use tiFy\Contracts\Partial\PartialFactory as PartialFactoryContract;
 use tiFy\Partial\PartialFactory;
 use tiFy\Partial\PartialView;
 use tiFy\Plugins\Multilingual\Contracts\Multilingual;
@@ -26,23 +27,11 @@ class MultilingualDropdown extends PartialFactory
         'viewer'    => []
     ];
 
-    /**
-     * CONSTRUCTEUR.
-     *
-     * @param string $id Nom de qualification.
-     * @param array $attrs Liste des attributs de configuration.
-     *
-     * @return void
-     */
-    public function __construct($id = null, $attrs = [])
-    {
-        parent::__construct($id, $attrs);
-    }
 
     /**
      * @inheritdoc
      */
-    public function boot()
+    public function boot(): void
     {
         add_action('init', function () {
             wp_register_style(
@@ -67,9 +56,9 @@ class MultilingualDropdown extends PartialFactory
     /**
      * @inheritdoc
      */
-    public function parse($attrs = [])
+    public function parse() : PartialFactoryContract
     {
-        parent::parse($attrs);
+        parent::parse();
 
         $this->set('attrs.class', sprintf($this->get('attrs.class', '%s'), 'MultilingualDropdown'));
 
@@ -92,16 +81,20 @@ class MultilingualDropdown extends PartialFactory
         endforeach;
 
         $this->set('items', $items);
+
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function parseDefaults()
+    public function parseDefaults() : PartialFactoryContract
     {
         foreach($this->get('view', []) as $key => $value) :
             $this->viewer()->set($key, $value);
         endforeach;
+
+        return $this;
     }
 
     /**

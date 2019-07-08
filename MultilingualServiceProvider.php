@@ -39,12 +39,12 @@ class MultilingualServiceProvider extends ServiceProvider
 
                 $this->multilingual = $this->getContainer()->get('multilingual');
 
-                partial()->register(
+                partial()->set(
                     'multilingual-flag',
                     $this->getContainer()->get('partial.factory.multilingual-flag')
                 );
 
-                partial()->register(
+                partial()->set(
                     'multilingual-dropdown',
                     $this->getContainer()->get('partial.factory.multilingual-dropdown')
                 );
