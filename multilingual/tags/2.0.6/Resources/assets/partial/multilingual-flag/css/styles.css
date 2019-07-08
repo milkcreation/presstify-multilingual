@@ -1,0 +1,15 @@
+#wp-admin-bar-my-sites .MultilingualFlag {
+    position: absolute;
+    top: 50%;
+    margin-top: -9px;
+    left: 10px;
+    width: 30px;
+    height: 18px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+#wp-admin-bar-my-sites .Multilingual-siteEntry > a.ab-item {
+    position:relative;
+    padding-left: 45px;
+}
