@@ -8,20 +8,14 @@
     "wordpress",
     "multilingual"
   ],
-  "homepage": "https://svn.tigreblanc.fr/presstify-plugins/multilingual",
+  "homepage": "https://github.com/milkcreation/presstify-multilingual.git",
   "license": "proprietary",
-  "time": "2019-07-07",
+  "time": "2021-09-13",
   "authors": [
     {
       "name": "Jordy Manner",
       "email": "jordy.manner@milkcreation.fr",
       "role": "Developper"
-    }
-  ],
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "http://composer.tigreblanc.fr/presstify/"
     }
   ],
   "require": {
